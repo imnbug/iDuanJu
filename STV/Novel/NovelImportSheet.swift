@@ -72,6 +72,7 @@ struct NovelImportSheet: View {
         .presentationDragIndicator(.hidden)
         .presentationCornerRadius(28)
         .presentationBackground(STVTheme.sheet)
+        .stvSheetKeyboard()
         .fileImporter(isPresented: $fileImport, allowedContentTypes: [.json, .plainText, .text]) { r in
             guard case .success(let u) = r else { return }
             let scoped = u.startAccessingSecurityScopedResource()

@@ -105,7 +105,7 @@ struct ActorRankView: View {
         ScrollView { ActorRankList().padding(.vertical, 8) }
             .background(STVTheme.bg.ignoresSafeArea())
             .navigationTitle("剧星榜")
-            .navigationBarTitleDisplayMode(.inline)
+            .stvInlineTitle()
             .refreshable { await ActorRankStore.shared.reload() }
     }
 }

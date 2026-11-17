@@ -17,7 +17,7 @@ final class OrientationGate: NSObject, UIApplicationDelegate {
         rotationGeneration += 1
         mask = .allButUpsideDown
         refresh()
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+        if let scene = ActiveWindowScene.scene() {
             scene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight)) { _ in }
         }
     }
@@ -29,7 +29,7 @@ final class OrientationGate: NSObject, UIApplicationDelegate {
         // Constrain during the rotation, then restore sensor rotation after the transition completes.
         mask = .portrait
         refresh()
-        if let scene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first(where: { $0.activationState == .foregroundActive }) {
+        if let scene = ActiveWindowScene.scene() {
             scene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait)) { _ in }
         }
         Task { @MainActor in
@@ -41,7 +41,7 @@ final class OrientationGate: NSObject, UIApplicationDelegate {
     @MainActor static func lockPortrait() {
         rotationGeneration += 1
         mask = .portrait
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+        if let scene = ActiveWindowScene.scene() {
             scene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
         refresh()

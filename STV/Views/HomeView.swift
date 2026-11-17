@@ -218,12 +218,13 @@ struct HomeView: View {
                 }.padding(20)
             }
             .background(STVTheme.surface.ignoresSafeArea())
-            .navigationTitle("频道").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("频道").stvInlineTitle()
             .accessibilityIdentifier("home.channelPanel")
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { showChannels = false } } }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .stvSheetChrome()
     }
 }
 
@@ -872,7 +873,7 @@ struct BoardListView: View {
         .background(STVTheme.bg.ignoresSafeArea())
         .accessibilityIdentifier("screen.board")
         .navigationTitle(board.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .task { if pager.items.isEmpty { reload() } }
     }
     private func reload() { let b = board; pager.reset { try await b.fetch($0, $1) } }

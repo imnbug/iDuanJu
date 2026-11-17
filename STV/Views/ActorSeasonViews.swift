@@ -72,6 +72,7 @@ struct SeasonPickerSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        .stvSheetChrome()
     }
 }
 
@@ -173,7 +174,7 @@ struct ActorView: View {
         .defaultScrollAnchor(DebugScroll.anchor)
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle(actor.name)
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .task { if profile == nil && works.isEmpty { await load() } }
     }
 

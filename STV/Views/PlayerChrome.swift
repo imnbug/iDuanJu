@@ -74,6 +74,7 @@ struct PlayerOptionsSheet<Option: Hashable>: View {
             }.padding(20).padding(.top, 12)
         }
         .presentationDetents([.height(96 + CGFloat((options.count + 2) / 3) * 54), .large])
+        .stvSheetChrome()
     }
 }
 

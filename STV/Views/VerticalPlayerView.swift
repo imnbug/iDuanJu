@@ -89,7 +89,7 @@ struct PlayerScreen: View {
 
     var body: some View {
         GeometryReader { outer in
-            let ins = outer.safeAreaInsets
+            let ins = PlayerSafeArea.resolve(swift: outer.safeAreaInsets, window: ActiveWindowScene.safeInsets())
             GeometryReader { geo in
                 let full = geo.size
                 let area = videoArea(full)

@@ -2,6 +2,7 @@ name: STV
 options:
   bundleIdPrefix: com.local
   deploymentTarget:
+    # Minimum remains iOS 18.0. scripts/package.sh selects the iOS 27.1 SDK and refuses another SDK.
     iOS: "18.0"
   createIntermediateGroups: true
 settings:

@@ -145,7 +145,7 @@ struct PluginVerifySheet: View {
             PluginWebView(pluginID: pluginID, url: url)
                 .ignoresSafeArea(edges: .bottom)
                 .navigationTitle(url.host ?? "验证")
-                .navigationBarTitleDisplayMode(.inline)
+                .stvInlineTitle()
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("完成") {
@@ -158,6 +158,7 @@ struct PluginVerifySheet: View {
                     ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
                 }
         }
+        .stvSheetChrome()
     }
 }
 

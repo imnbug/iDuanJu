@@ -88,7 +88,7 @@ struct PluginsView: View {
         }
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle("插件")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .overlay { if busy == "prepare" { ProgressView("正在校验插件…").padding(20).background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14)) } }
         .sheet(item: $pending) { p in
             PluginConsentSheet(pending: p) { ok in
@@ -313,12 +313,13 @@ struct PluginConsentSheet: View {
                 }
             }
             .navigationTitle(pending.isUpdate ? "更新插件" : "安装插件")
-            .navigationBarTitleDisplayMode(.inline)
+            .stvInlineTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("取消") { done(false) } }
                 ToolbarItem(placement: .confirmationAction) { Button(pending.isUpdate ? "更新" : "安装") { done(true) }.accessibilityIdentifier("plugins.consent.install") }
             }
         }
+        .stvSheetChrome()
         .accessibilityIdentifier("plugins.consent")
     }
 
@@ -336,13 +337,14 @@ private struct PasteSheet: View {
                 .overlay(alignment: .topLeading) {
                     if text.isEmpty { Text("粘贴 .idjplugin 内容（JSON）或插件 / 订阅链接").foregroundStyle(.secondary).padding(14).allowsHitTesting(false) }
                 }
-                .navigationTitle("粘贴插件").navigationBarTitleDisplayMode(.inline)
+                .navigationTitle("粘贴插件").stvInlineTitle()
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("取消") { done(nil) } }
                     ToolbarItem(placement: .principal) { Button("从剪贴板") { text = UIPasteboard.general.string ?? "" } }
                     ToolbarItem(placement: .confirmationAction) { Button("下一步") { done(text) }.disabled(text.isEmpty) }
                 }
         }
+        .stvSheetChrome()
     }
 }
 
@@ -367,7 +369,7 @@ private struct AddCMSSheet: View {
                 }
                 if let error { Text(error).foregroundStyle(.red).font(.caption) }
             }
-            .navigationTitle("添加采集站").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("添加采集站").stvInlineTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("取消") { done(nil) } }
                 ToolbarItem(placement: .confirmationAction) {
@@ -384,6 +386,7 @@ private struct AddCMSSheet: View {
                 }
             }
         }
+        .stvSheetChrome()
     }
 }
 
@@ -404,7 +407,7 @@ struct PluginDetailView: View {
             if let p = store.plugin(id) { content(p) } else { Text("插件已卸载").foregroundStyle(STVTheme.secondary) }
         }
         .navigationTitle(store.plugin(id)?.manifest.name ?? "插件")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
     }
@@ -490,7 +493,7 @@ struct PluginLogView: View {
             }.padding(16)
         }
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("运行日志").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("运行日志").stvInlineTitle()
         .toolbar { ToolbarItem { Button { UIPasteboard.general.string = lines.joined(separator: "\n") } label: { Image(systemName: "doc.on.doc") } } }
         .task { lines = PluginLog.lines(id) }
         .onReceive(NotificationCenter.default.publisher(for: PluginLog.changed)) { _ in lines = PluginLog.lines(id) }

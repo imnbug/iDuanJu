@@ -66,7 +66,7 @@ struct MangaHomeView: View {
         .scrollIndicators(.hidden)
         .refreshable { await load(more: false) }
         .background(embedded ? Color.clear : STVTheme.bg)
-        .navigationTitle(embedded ? "" : "漫画").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(embedded ? "" : "漫画").stvInlineTitle()
         .toolbar(embedded ? .hidden : .visible, for: .navigationBar)
         .task(id: "\(source.rawValue)|\(category?.id ?? "")") { await load(more: false) }
         .onChange(of: sources) { _, now in if !now.contains(source) { category = nil; source = .baozi } }
@@ -151,7 +151,7 @@ struct MangaLibraryView: View {
         }
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("书架").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("书架").stvInlineTitle()
     }
 }
 
@@ -204,7 +204,7 @@ struct MangaDetailView: View {
             }.padding(16)
         }
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("").stvInlineTitle()
         .zoomDestination("manga:" + item.id, ns)
         .task {
             do { detail = try await provider.detail(item) } catch { self.error = error.localizedDescription }
