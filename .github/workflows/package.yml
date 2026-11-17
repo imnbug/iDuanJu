@@ -3,6 +3,11 @@ name: package
 # Packaging only builds and uploads artifacts. Regression tests live in the separate validation workflows.
 on:
   workflow_dispatch:
+    inputs:
+      ios_only:
+        description: Build only the unsigned iOS package
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,6 +64,7 @@ jobs:
 
   apk:
     name: Android APK
+    if: ${{ inputs.ios_only != true }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:

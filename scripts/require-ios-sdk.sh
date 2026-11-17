@@ -35,6 +35,9 @@ if ! command -v xcodebuild >/dev/null 2>&1 || ! command -v xcrun >/dev/null 2>&1
   fail "当前环境没有 xcodebuild / xcrun，不能用 iOS ${want_sdk} SDK 编译。"
 fi
 
+echo "runner: ${RUNNER_NAME:-local} ${RUNNER_OS:-} ${ImageOS:-}"
+sw_vers || true
+uname -m || true
 echo "xcode-select: $(xcode-select -p)"
 xcodebuild -version
 xcode_line=$(xcodebuild -version | head -n 1)
