@@ -4,6 +4,7 @@
 # Version comes from project.yml.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+scripts/require-ios-sdk.sh
 OUT="${1:-$PWD/dist}"
 VER=$(awk -F'"' '/MARKETING_VERSION/{print $2; exit}' project.yml)
 BUILD=$(awk -F'"' '/CURRENT_PROJECT_VERSION/{print $2; exit}' project.yml)
@@ -14,16 +15,16 @@ mkdir -p "$LOG_DIR"
 xcodegen generate >/dev/null
 common=(-project STV.xcodeproj -scheme STV -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="")
 
-xcodebuild "${common[@]}" -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath DerivedDataRelease build 2>&1 | tee "$LOG_DIR/ios.log"
+xcodebuild "${common[@]}" -sdk iphoneos27.1 -destination 'generic/platform=iOS' -derivedDataPath DerivedDataRelease build 2>&1 | tee "$LOG_DIR/ios.log"
 APP_PLIST=DerivedDataRelease/Build/Products/Release-iphoneos/STV.app/Info.plist
 [[ "$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$APP_PLIST")" == "$VER" ]]
 [[ "$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$APP_PLIST")" == "$BUILD" ]]
 if [[ "${STV_BUILD_SIMULATOR:-1}" == "1" || "${STV_RUN_TESTS:-0}" == "1" ]]; then
 SIM_ARCH=$(uname -m)
-xcodebuild "${common[@]}" -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS="$SIM_ARCH" ONLY_ACTIVE_ARCH=YES ENABLE_TESTABILITY=YES -derivedDataPath DerivedDataRelease build 2>&1 | tee "$LOG_DIR/simulator.log"
+xcodebuild "${common[@]}" -sdk iphonesimulator27.1 -destination 'generic/platform=iOS Simulator' ARCHS="$SIM_ARCH" ONLY_ACTIVE_ARCH=YES ENABLE_TESTABILITY=YES -derivedDataPath DerivedDataRelease build 2>&1 | tee "$LOG_DIR/simulator.log"
 if [[ "${STV_RUN_TESTS:-0}" == "1" ]]; then
-  SIM_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for devices in d["devices"].values() for x in devices if x["name"].startswith("iPhone")))')
-  xcodebuild -project STV.xcodeproj -scheme STV -configuration Release \
+  SIM_ID=$(xcrun simctl list devices available -j | python3 scripts/select-ios-simulator.py)
+  xcodebuild -project STV.xcodeproj -scheme STV -configuration Release -sdk iphonesimulator27.1 \
     -destination "platform=iOS Simulator,id=$SIM_ID" -derivedDataPath DerivedDataRelease \
     CODE_SIGNING_ALLOWED=NO ARCHS="$SIM_ARCH" ONLY_ACTIVE_ARCH=YES ENABLE_TESTABILITY=YES -parallel-testing-enabled NO \
     -only-testing:STVTests/LegadoTests -only-testing:STVTests/PluginTests/testCMSCategoryRequestsKeepFullCategoryList \

@@ -38,7 +38,7 @@ struct SiteVerifySheet: View {
                 VerifyWebView(url: URL(string: target.url)) { snap in handle(snap) }
             }
             .navigationTitle("\(target.source.label) 站点验证")
-            .navigationBarTitleDisplayMode(.inline)
+            .stvInlineTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
@@ -47,6 +47,7 @@ struct SiteVerifySheet: View {
             }
         }
         .presentationBackground(STVTheme.bg)
+        .stvSheetKeyboard()
         .onAppear { SiteLog.add("[\(target.source.label)] 打开验证页 \(target.url)") }
     }
 

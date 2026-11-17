@@ -7,20 +7,25 @@ permissions:
   contents: read
 jobs:
   ios-ui:
-    runs-on: macos-15
-    timeout-minutes: 20
+    runs-on: xcode-27
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "27.1"
+      - name: Require iOS 27.1 SDK
+        run: scripts/require-ios-sdk.sh
       - run: brew install xcodegen
       - name: Build and test production novel screens in isolation
         run: |
           python3 scripts/novel-validation/preview.py "$RUNNER_TEMP/novel-preview"
           cd "$RUNNER_TEMP/novel-preview"
           xcodegen generate
-          SIM=$(xcrun simctl list devices available -j | python3 -c 'import json,sys;print(next(d["udid"] for v in json.load(sys.stdin)["devices"].values() for d in v if d["name"].startswith("iPhone")))')
+          SIM=$(xcrun simctl list devices available -j | python3 "$GITHUB_WORKSPACE/scripts/select-ios-simulator.py")
           echo "SIM=$SIM" >> "$GITHUB_ENV"
           set -o pipefail
-          xcodebuild -project NovelPreview.xcodeproj -scheme STV -destination "platform=iOS Simulator,id=$SIM" -derivedDataPath build CODE_SIGNING_ALLOWED=NO -parallel-testing-enabled NO test 2>&1 | tee "$RUNNER_TEMP/novel-build.log"
+          xcodebuild -project NovelPreview.xcodeproj -scheme STV -sdk iphonesimulator27.1 -destination "platform=iOS Simulator,id=$SIM" -derivedDataPath build CODE_SIGNING_ALLOWED=NO -parallel-testing-enabled NO test 2>&1 | tee "$RUNNER_TEMP/novel-build.log"
       - name: Capture actual native ranking layout
         run: |
           xcrun simctl boot "$SIM" || true

@@ -89,7 +89,7 @@ struct SourcesView: View {
         .defaultScrollAnchor(DebugScroll.anchor)
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle("片源管理")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .task { if gate.lockEnabled { await gate.unlock() } }
         .task { cacheBytes = await Task.detached { PrefetchStore.shared.totalBytes() }.value }
     }
@@ -302,7 +302,7 @@ struct LicensesView: View {
         .defaultScrollAnchor(DebugScroll.anchor)
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle("开源许可")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
     }
 }
 
@@ -340,7 +340,7 @@ struct SiteLogView: View {
         }
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle("站点诊断日志")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(copied ? "已复制" : "复制") {

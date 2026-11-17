@@ -28,7 +28,7 @@ struct LibraryListView: View {
         }
         .background(STVTheme.bg.ignoresSafeArea())
         .navigationTitle(kind == .favorites ? "我的收藏" : "观看历史")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .toolbar {
             if kind == .history, !library.continueWatching.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {

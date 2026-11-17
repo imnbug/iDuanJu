@@ -35,7 +35,7 @@ struct TGBlockSheet: View {
                 }
                 Section { Toggle("只对 @\(post.channel) 生效", isOn: $channelOnly) }
             }
-            .navigationTitle("加入屏蔽").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("加入屏蔽").stvInlineTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
@@ -50,6 +50,7 @@ struct TGBlockSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        .stvSheetChrome()
     }
 }
 
@@ -90,10 +91,11 @@ struct TGBotSheet: View {
                     ForEach(replies) { p in TGPostCard(post: p, channel: nil) }
                 }.padding(20)
             }
-            .navigationTitle("机器人链接").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("机器人链接").stvInlineTitle()
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("完成") { dismiss() } } }
         }
         .presentationDetents([.medium, .large])
+        .stvSheetChrome()
     }
 }
 
@@ -155,7 +157,7 @@ struct TGManageView: View {
         }
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("频道管理").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("频道管理").stvInlineTitle()
         .toolbar { EditButton() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("tg.manageView")
@@ -245,7 +247,7 @@ struct TGRulesView: View {
         }
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("屏蔽规则").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("屏蔽规则").stvInlineTitle()
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json, .plainText]) { r in
             guard let u = try? r.get() else { return }
             let ok = u.startAccessingSecurityScopedResource(); defer { if ok { u.stopAccessingSecurityScopedResource() } }
@@ -299,7 +301,7 @@ struct TGSearchView: View {
             }.padding(.bottom, 30)
         }
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("搜索频道").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("搜索频道").stvInlineTitle()
         .onChange(of: online) { _, _ in if searched { run() } }
         .onChange(of: channel) { _, _ in if searched { run() } }
         .fullScreenCover(item: $viewer) { v in ImageViewer(items: v.urls.map { .init(url: $0) }, index: v.index) }
@@ -347,7 +349,7 @@ struct DownloadsView: View {
         }
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("下载管理").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("下载管理").stvInlineTitle()
         .fullScreenCover(item: $viewer) { v in ImageViewer(items: v.urls.map { .init(url: $0) }, index: v.index) }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("downloads.view")
@@ -492,7 +494,7 @@ struct TDLibSettingsView: View {
         }
         .scrollContentBackground(.hidden)
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle("TDLib 登录").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("TDLib 登录").stvInlineTitle()
         .accessibilityIdentifier("tdlib.view")
         // Entering the page restores a saved session if launch-time bootstrap hasn't yet.
         .task { if case .idle = td.state, td.hasLocalSession { await td.start() } else { await td.refreshSensitive() } }
@@ -535,7 +537,7 @@ struct TDChatView: View {
             }
         }
         .background(STVTheme.bg.ignoresSafeArea())
-        .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(title).stvInlineTitle()
         .task { await more() }
         .fullScreenCover(item: $viewer) { v in ImageViewer(items: v.urls.map { .init(url: $0) }, index: v.index) }
     }

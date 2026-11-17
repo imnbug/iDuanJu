@@ -325,5 +325,6 @@ struct DanmakuSettingsSheet: View {
             .padding(20).padding(.top, 8)
         }
         .presentationDetents([.medium, .large])
+        .stvSheetKeyboard()
     }
 }

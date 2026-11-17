@@ -52,7 +52,7 @@ struct ChannelFeedView: View {
             if let toast { Text(toast).font(.footnote).foregroundStyle(.white).padding(10).background(.black.opacity(0.75), in: Capsule()).padding(.bottom, 90) }
         }
         .navigationTitle(embedded ? "" : "频道")
-        .navigationBarTitleDisplayMode(.inline)
+        .stvInlineTitle()
         .toolbar(embedded ? .hidden : .visible, for: .navigationBar)
         .task { if store.feed(only).isEmpty { await store.refresh() } }
         .task(id: toast) { if toast != nil { try? await Task.sleep(for: .seconds(2.2)); toast = nil } }

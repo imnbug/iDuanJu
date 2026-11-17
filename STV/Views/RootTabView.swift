@@ -1,23 +1,27 @@
 import SwiftUI
+import UIKit
 
 /// 四个根页面 + PlutoFish 式底部悬浮玻璃胶囊导航（系统 TabBar 隐藏）。
 /// 胶囊只在根页面显示；进入详情 / 播放器等二级页面时隐藏。
 struct RootTabView: View {
     @State private var tab = Int(ProcessInfo.processInfo.environment["STV_TAB"] ?? "") ?? 0
     @State private var paths = [NavigationPath(), NavigationPath(), NavigationPath(), NavigationPath()]
+    @State private var bottomInset = TabCapsuleLayout.legacyPhoneInset
     static let items: [(String, String)] = [("首页", "house.fill"), ("搜索", "magnifyingglass"),
                                             ("找剧", "square.grid.2x2.fill"), ("我的", "person.crop.circle.fill")]
     var body: some View {
         TabView(selection: $tab) {
-            Stack(path: $paths[0]) { HomeView() }.tag(0)
-            Stack(path: $paths[1]) { SearchView() }.tag(1)
-            Stack(path: $paths[2]) { CategoryView() }.tag(2)
-            Stack(path: $paths[3]) { ProfileView() }.tag(3)
+            Stack(path: $paths[0], bottomInset: bottomInset) { HomeView() }.tag(0)
+            Stack(path: $paths[1], bottomInset: bottomInset) { SearchView() }.tag(1)
+            Stack(path: $paths[2], bottomInset: bottomInset) { CategoryView() }.tag(2)
+            Stack(path: $paths[3], bottomInset: bottomInset) { ProfileView() }.tag(3)
         }
         .tint(STVTheme.accent)
+        .toolbar(.hidden, for: .tabBar)
+        .toolbarBackground(.hidden, for: .tabBar)
         .overlay(alignment: .bottom) {
             if paths[tab].isEmpty {
-                GlassTabBar(selection: $tab, items: Self.items) { i in
+                GlassTabBar(selection: $tab, items: Self.items, bottomInset: bottomInset) { i in
                     if i == tab { paths[i] = NavigationPath() }
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -25,34 +29,43 @@ struct RootTabView: View {
         }
         .animation(.spring(response: 0.32, dampingFraction: 0.86), value: paths[tab].isEmpty)
         .onAppear {
+            refreshInset()
             Router.handler = { r in paths[tab].append(r) }
             #if DEBUG
             if ProcessInfo.processInfo.environment["STV_TD_OPEN"] == "1" { Router.push(.tdlib) }
             #endif
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            refreshInset()
+        }
         // Cold start: restore a saved TDLib login (no network login, nothing is sent).
         .task { await TDLibService.shared.bootstrap() }
     }
+
+    private func refreshInset() { bottomInset = ActiveWindowScene.bottomInset() }
 }
 
 private struct Stack<V: View>: View {
     @Binding var path: NavigationPath
+    var bottomInset: CGFloat
     @ViewBuilder var content: V
     @Namespace private var ns
     var body: some View {
         NavigationStack(path: $path) {
             content
                 .toolbar(.hidden, for: .tabBar)
-                .safeAreaInset(edge: .bottom, spacing: 0) { Color.clear.frame(height: GlassTabBar.clearance) }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    Color.clear.frame(height: TabCapsuleLayout.contentClearance(bottomInset: bottomInset))
+                }
                 .routes()
         }.environment(\.zoomNS, ns)
     }
 }
 
 struct GlassTabBar: View {
-    static let clearance: CGFloat = 72
     @Binding var selection: Int
     let items: [(String, String)]
+    var bottomInset: CGFloat
     var onReselect: (Int) -> Void = { _ in }
     @Namespace private var ns
     var body: some View {
@@ -84,6 +97,7 @@ struct GlassTabBar: View {
         // ui-redesign `.tabbar`: 60 pt glass capsule, 16 pt from the sides, 26 pt above the screen edge.
         .dsBar(30)
         .padding(.horizontal, 16)
-        .padding(.bottom, -8)
+        // 26 pt above the physical bottom. A 34 pt inset keeps the previous -8 pt padding.
+        .padding(.bottom, TabCapsuleLayout.bottomPadding(bottomInset: bottomInset))
     }
 }

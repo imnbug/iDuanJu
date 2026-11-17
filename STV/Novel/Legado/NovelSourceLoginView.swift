@@ -67,6 +67,7 @@ struct NovelSourceLoginView: View {
                 refresh()
             }
         }
+        .stvSheetKeyboard()
     }
 
     @ViewBuilder private func input(_ f: LegadoClient.LoginField) -> some View {

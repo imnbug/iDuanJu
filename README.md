@@ -90,14 +90,16 @@ i短剧 是一个原生 SwiftUI 编写的 iOS 多源短剧 / 视频 / 漫画 / T
 
 ## 编译
 
-要求：macOS + Xcode 16 或更新、[XcodeGen](https://github.com/yonaskolb/XcodeGen)，最低支持 **iOS 18.0**（AetherEngine 的要求）。
+要求：macOS 26.6 或更新、**Xcode 27.1**（含 iOS 27.1 SDK）、[XcodeGen](https://github.com/yonaskolb/XcodeGen)。最低部署目标仍是 **iOS 18.0**，不要改成 27.1。打包前 `scripts/require-ios-sdk.sh` 会检查 `xcodebuild -version` 是否为 Xcode 27.1，以及 `iphoneos27.1` / `iphonesimulator27.1` 是否都是 27.1；缺 SDK 就失败，不会改用别的 SDK。GitHub Actions 的打包、播放器验证和小说界面验证使用官方 `xcode-27` runner（镜像说明里的默认 Xcode 是 27.1）。`macos-26` 镜像最高只到 iOS 26.5 SDK，不能用来做这次构建。不需要签名证书。
 
 ```bash
+sudo xcode-select -s /Applications/Xcode_27.1.app
 brew install xcodegen
 git clone https://github.com/my-name-is-alan/iDuanJu.git && cd iDuanJu
+scripts/require-ios-sdk.sh
 xcodegen generate          # 生成 STV.xcodeproj（工程文件不入库）
 open STV.xcodeproj         # 或命令行：
-xcodebuild -project STV.xcodeproj -scheme STV -sdk iphonesimulator \
+xcodebuild -project STV.xcodeproj -scheme STV -sdk iphonesimulator27.1 \
   -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
@@ -202,7 +204,7 @@ UserDefaults 键 `stv.hg.purePlayerDevice` 写入你自己的 `"<device_id>,<iid
 **iDuanJu** is a native SwiftUI iOS aggregator/player for short dramas, videos, manga and Telegram channels, with a
 sandboxed QuickJS plugin system (per-plugin domain allow-list, isolated cookies/storage, no `eval`). It hosts no content.
 
-- Build: `xcodegen generate`, then build the `STV` scheme in Xcode (iOS 18.0+).
+- Build: Xcode 27.1 and the iOS 27.1 SDK (`scripts/require-ios-sdk.sh`), deployment target iOS 18.0. `xcodegen generate`, then build the `STV` scheme. GitHub Actions uses the `xcode-27` runner.
 - Player core: AetherEngine 7.62.0 (LGPL-3.0 with App Store exception, unmodified) with FFmpeg (LGPL-2.1) shipped as replaceable
   dynamic frameworks; automatic AVPlayer fallback; speed capped at 2× by the engine; optional HLS ad-strip (on by default). Sideload the unsigned IPA from `scripts/package.sh`.
 - **Android** (`android/`): native Kotlin + Jetpack Compose + Media3, minSdk 26 / targetSdk 35. Build with JDK 21:
