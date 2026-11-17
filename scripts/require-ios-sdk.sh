@@ -39,8 +39,11 @@ echo "runner: ${RUNNER_NAME:-local} ${RUNNER_OS:-} ${ImageOS:-}"
 sw_vers || true
 uname -m || true
 echo "xcode-select: $(xcode-select -p)"
-xcodebuild -version
-xcode_line=$(xcodebuild -version | head -n 1)
+# Xcode 27.1's xcodebuild raises NSFileHandleOperationException (exit 134) if a
+# pipe closes early. Read the whole version output; do not pipe it to head.
+xcode_out=$(xcodebuild -version)
+printf '%s\n' "$xcode_out"
+xcode_line=${xcode_out%%$'\n'*}
 [[ "$xcode_line" == "$want_xcode" ]] || fail "选中的工具链是「${xcode_line}」，不是 ${want_xcode}。"
 
 device_ver=$(xcrun --sdk "$device_sdk" --show-sdk-version 2>/dev/null || true)
